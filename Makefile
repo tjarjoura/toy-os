@@ -1,19 +1,22 @@
-objs = boot.o kernel.o vgatext.o
-cflags = -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+CFLAGS:=-std=gnu99 -ffreestanding -O2 -Wall -Wextra
+
+OBJS:=boot.o dt.o descriptor_table.o kernel.o vgatext.o
+LIBS:=-lgcc
+LDFLAGS:=-nostdlib
+
+CC:=i686-elf-gcc
+AS:=i686-elf-as
 
 all: iso
 
-myos.bin: $(objs)
-	i686-elf-gcc -T linker.ld -o myos.bin -ffreestanding -O2 -nostdlib boot.o kernel.o vgatext.o -lgcc
+myos.bin: $(OBJS)
+	$(CC) -T linker.ld -o $@ $(CFLAGS) $(OBJS) $(LDFLAGS) $(LIBS)
 
-boot.o: boot.s
-	i686-elf-as boot.s -o boot.o
+%.o: %.s
+	$(AS) $< -o $@
 
-vgatext.o: vgatext.c
-	i686-elf-gcc -c vgatext.c -o vgatext.o $(cflags)
-
-kernel.o: kernel.c
-	i686-elf-gcc -c kernel.c -o kernel.o $(cflags)
+%.o: %.c
+	$(CC) -c $< -o $@ $(CFLAGS)
 
 iso: myos.bin
 	cp myos.bin isodir/boot/myos.bin

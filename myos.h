@@ -27,6 +27,11 @@ enum vga_color {
 };
 
 
-void vga_putchar(uint8_t c, enum vga_color foreground, enum vga_color background);
+void vga_putchar(uint8_t c);
+void vga_putstring(const uint8_t *str);
+
+/* kernel stdlib */
+void *k_memcpy(void *dest, const void *src, size_t num);
+void *k_memset(void *dest, uint8_t val, size_t num);
 
 #endif
