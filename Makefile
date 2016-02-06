@@ -1,6 +1,6 @@
 CFLAGS:=-std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
-OBJS:=boot.o dt.o descriptor_table.o kernel.o vgatext.o
+OBJS:=boot.o descriptor_table.o dt.o isr.o kernel.o vgatext.o
 LIBS:=-lgcc
 LDFLAGS:=-nostdlib
 
