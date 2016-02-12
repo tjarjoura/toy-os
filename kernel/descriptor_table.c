@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include "descriptor_table.h"
 #include "myos.h"
+#include "sysio.h"
 
 void flush_gdt(void *);
 void flush_idt(void *);
@@ -39,6 +40,22 @@ void isr29();
 void isr30();
 void isr31();
 
+void irq0();
+void irq1();
+void irq2();
+void irq3();
+void irq4();
+void irq5();
+void irq6();
+void irq7();
+void irq8();
+void irq9();
+void irq10();
+void irq11();
+void irq12();
+void irq13();
+void irq14();
+void irq15();
 
 struct gdt_entry {
     uint16_t limit;
@@ -118,9 +135,50 @@ void interrupt_handler(struct saved_registers saved_registers) {
     vga_putstring("Received interrupt ");
     vga_putchar(saved_registers.int_num + '0');
     vga_putchar('\n');
+
+    vga_putstring("Error code ");
+    vga_putchar(saved_registers.err_code + '0');
+    vga_putchar('\n');
+}
+
+void irq_handler(struct saved_registers saved_registers) {
+    if (saved_registers.int_num > 40) /* Interrupt came from Slave PIC */
+        outb(0xA0, 0x20);
+    outb(0x20, 0x20); /* Send EOI signal to PIC controllers */
+
+    kprintf("Received Interrupt(IRQ): %d\n", saved_registers.int_num);
 }
 
 void init_idt() {
+    uint8_t a, b;
+    a = inb(0x21);
+    b = inb(0xA1);
+
+    /* Remap IRQ offsets on the PIC (Programmable Interrupt Controller) */
+    outb(0x20, 0x11);
+    io_wait();
+    outb(0xA0, 0x11);
+    io_wait();
+    outb(0x21, 0x20);
+    io_wait();
+    outb(0xA1, 0x28);
+    io_wait();
+    outb(0x21, 0x04);
+    io_wait();
+    outb(0xA1, 0x02);
+    io_wait();
+    outb(0x21, 0x01);
+    io_wait();
+    outb(0xA1, 0x01);
+    io_wait();
+    outb(0x21, 0x0);
+    io_wait();
+    outb(0xA1, 0x0);
+    io_wait();
+
+    outb(0x21, a);
+    outb(0xA1, b);
+
     idt[0] = idt_entry((uint32_t) isr0, 0x08, 0x8E);
     idt[1] = idt_entry((uint32_t) isr1, 0x08, 0x8E);
     idt[2] = idt_entry((uint32_t) isr2, 0x08, 0x8E);
@@ -153,6 +211,26 @@ void init_idt() {
     idt[29] = idt_entry((uint32_t) isr29, 0x08, 0x8E);
     idt[30] = idt_entry((uint32_t) isr30, 0x08, 0x8E);
     idt[31] = idt_entry((uint32_t) isr31, 0x08, 0x8E);
+    idt[32] = idt_entry((uint32_t) irq0, 0x08, 0x8E);
+    idt[33] = idt_entry((uint32_t) irq1, 0x08, 0x8E);
+    idt[34] = idt_entry((uint32_t) irq2, 0x08, 0x8E);
+    idt[35] = idt_entry((uint32_t) irq3, 0x08, 0x8E);
+    idt[36] = idt_entry((uint32_t) irq4, 0x08, 0x8E);
+    idt[37] = idt_entry((uint32_t) irq5, 0x08, 0x8E);
+    idt[38] = idt_entry((uint32_t) irq6, 0x08, 0x8E);
+    idt[39] = idt_entry((uint32_t) irq7, 0x08, 0x8E);
+    idt[40] = idt_entry((uint32_t) irq8, 0x08, 0x8E);
+    idt[41] = idt_entry((uint32_t) irq9, 0x08, 0x8E);
+    idt[42] = idt_entry((uint32_t) irq10, 0x08, 0x8E);
+    idt[43] = idt_entry((uint32_t) irq11, 0x08, 0x8E);
+    idt[44] = idt_entry((uint32_t) irq12, 0x08, 0x8E);
+    idt[45] = idt_entry((uint32_t) irq13, 0x08, 0x8E);
+    idt[46] = idt_entry((uint32_t) irq14, 0x08, 0x8E);
+    idt[47] = idt_entry((uint32_t) irq15, 0x08, 0x8E);
 
     flush_idt(&idt_r);
+
+    outb(0x43, 0x36);
+    outb(0x40, 0xFF);
+    outb(0x40, 0x00);
 }

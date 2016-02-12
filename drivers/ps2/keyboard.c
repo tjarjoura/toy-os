@@ -1,0 +1,6 @@
+#define PS2_ACK 0xFA
+#define PS2_RESEND 0xFE
+#define PS2_TEST_FAILED 0xFC
+#define PS2_TEST_PASSED 0xAA
+
+

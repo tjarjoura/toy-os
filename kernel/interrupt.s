@@ -8,7 +8,7 @@
 
         isr\intnum:
             cli
-            push 0
+            push 2
             push \intnum
             jmp interrupt_common
     .endm
@@ -22,6 +22,15 @@
             jmp interrupt_common
     .endm
 
+    .macro IRQ irqnum intnum
+        .globl irq\irqnum
+        irq\irqnum:
+            cli
+            push 0
+            push \intnum
+            jmp irq_common
+    .endm
+
     interrupt_common:
         pusha
         call interrupt_handler
@@ -29,6 +38,14 @@
         add esp, 8
         sti
         iret
+
+    irq_common:
+        pusha
+        call irq_handler
+        popa
+        add esp, 8
+        sti
+        nop
 
     ISR_NOERRCODE 0
     ISR_NOERRCODE 1
@@ -62,3 +79,21 @@
     ISR_NOERRCODE 29
     ISR_NOERRCODE 30
     ISR_NOERRCODE 31
+
+    IRQ 0 32
+    IRQ 1 33
+    IRQ 2 34
+    IRQ 3 35
+    IRQ 4 36
+    IRQ 5 37
+    IRQ 6 38
+    IRQ 7 39
+    IRQ 8 40
+    IRQ 9 40
+    IRQ 10 41
+    IRQ 11 42
+    IRQ 12 43
+    IRQ 13 44
+    IRQ 14 45
+    IRQ 15 46
+

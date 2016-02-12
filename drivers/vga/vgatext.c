@@ -7,27 +7,10 @@
 #include <stddef.h>
 
 #include "myos.h"
+#include "sysio.h"
 
 #define WIDTH  80
 #define HEIGHT 25
-
-void *k_memcpy(void *dest, const void *src, size_t num) {
-    size_t i;
-
-    for (i = 0; i < num; i++)
-        *(((uint8_t *) dest) + i) = *(((uint8_t *) src) + i);
-
-    return dest;
-}
-
-void *k_memset(void *dest, uint8_t val, size_t num) {
-    size_t i;
-
-    for (i = 0; i < num; i++)
-        *(((uint8_t *) dest) + i) = val;
-
-    return dest;
-}
 
 static uint16_t *vga_text_buffer = (uint16_t *) 0xB8000;
 static uint8_t color = 0x09; /* 0000 1111 --  White on black background */
@@ -38,27 +21,39 @@ static void scroll() {
     k_memset(vga_text_buffer + (HEIGHT-1) * WIDTH, 0x00, WIDTH*sizeof(uint16_t));
 }
 
+static void set_cursor(uint16_t pos) {
+    outb(0x3D4, 14); /* Tell VGA controller we are setting high byte */
+    outb(0x3D5, pos >> 8);
+
+    outb(0x3D4, 15); /* And the low byte */
+    outb(0x3D5, pos);
+}
+
 void vga_setcolor(enum vga_color foreground, enum vga_color background) {
     color = ((background & 0x7) << 4) | foreground;
 }
 
-
 void vga_putchar(uint8_t c) {
     uint16_t character = (color << 8) | c;
-    int cursor = (row * WIDTH) + column;
+    int cursor = row * WIDTH + column;
 
-    if (c != '\n')
+    if ((c != '\n') && (c != '\t'))
         vga_text_buffer[cursor] = character;
 
-    if (++column >= WIDTH || (c == '\n')) {
+    if (c == '\t')
+        while ((++column % 8) != 0) ;
+    else if (++column >= WIDTH || (c == '\n')) {
         column = 0;
         if (++row >= HEIGHT) {
             scroll();
             --row;
         }
     }
+
+    set_cursor(row * WIDTH + column);
 }
 
+// TODO: Move to general io file, turn into printf?
 void vga_putstring(const uint8_t *str) {
     int i;
 

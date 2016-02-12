@@ -1,6 +1,7 @@
 #ifndef MYOS_H
 
 #include <stddef.h>
+#include <stdint.h>
 
 #if defined(__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
@@ -35,5 +36,7 @@ void vga_putstring(const uint8_t *str);
 /* kernel stdlib */
 void *k_memcpy(void *dest, const void *src, size_t num);
 void *k_memset(void *dest, uint8_t val, size_t num);
+
+void kprintf(const char *fmt, ...);
 
 #endif

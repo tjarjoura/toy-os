@@ -1,13 +1,20 @@
 CFLAGS:=-std=gnu99 -ffreestanding -O2 -Wall -Wextra
 
-OBJS:=boot.o descriptor_table.o dt.o isr.o kernel.o vgatext.o
 LIBS:=-lgcc
 LDFLAGS:=-nostdlib
 
 CC:=i686-elf-gcc
 AS:=i686-elf-as
 
+INCLUDEDIR:=include
+
 all: iso
+
+include drivers/make.config
+include kernel/make.config
+include lib/make.config
+
+OBJS:= $(DRIVER_OBJS) $(KERNEL_OBJS) $(LIB_OBJS)
 
 myos.bin: $(OBJS)
 	$(CC) -T linker.ld -o $@ $(CFLAGS) $(OBJS) $(LDFLAGS) $(LIBS)
@@ -16,12 +23,12 @@ myos.bin: $(OBJS)
 	$(AS) $< -o $@
 
 %.o: %.c
-	$(CC) -c $< -o $@ $(CFLAGS)
+	$(CC) -c $< -o $@ $(CFLAGS) -I include
 
 iso: myos.bin
 	cp myos.bin isodir/boot/myos.bin
 	grub-mkrescue -d /usr/lib/grub/i386-pc/ -o myos.iso isodir
 
 clean:
-	rm *.o myos.bin myos.iso
+	rm $(OBJS) myos.bin myos.iso
 
