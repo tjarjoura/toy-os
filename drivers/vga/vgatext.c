@@ -6,7 +6,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#include "myos.h"
+#include "common.h"
+#include "lib.h"
 #include "sysio.h"
 
 #define WIDTH  80
@@ -51,13 +52,5 @@ void vga_putchar(uint8_t c) {
     }
 
     set_cursor(row * WIDTH + column);
-}
-
-// TODO: Move to general io file, turn into printf?
-void vga_putstring(const uint8_t *str) {
-    int i;
-
-    for (i = 0; str[i] != '\0'; i++)
-        vga_putchar(str[i]);
 }
 

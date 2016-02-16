@@ -45,7 +45,7 @@
         popa
         add esp, 8
         sti
-        nop
+        iret
 
     ISR_NOERRCODE 0
     ISR_NOERRCODE 1

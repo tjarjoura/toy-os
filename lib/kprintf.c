@@ -1,5 +1,5 @@
 #include <stdarg.h>
-#include "myos.h"
+#include "common.h"
 
 static void write_int(int x, int base) {
     static const char digits[] = {'0', '1', '2', '3', '4', '5', '6', '7',

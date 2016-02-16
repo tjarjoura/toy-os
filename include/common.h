@@ -29,14 +29,6 @@ enum vga_color {
     COLOR_WHITE         = 15,
 };
 
-
 void vga_putchar(uint8_t c);
-void vga_putstring(const uint8_t *str);
-
-/* kernel stdlib */
-void *k_memcpy(void *dest, const void *src, size_t num);
-void *k_memset(void *dest, uint8_t val, size_t num);
-
-void kprintf(const char *fmt, ...);
 
 #endif

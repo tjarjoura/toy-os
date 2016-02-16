@@ -1,5 +1,7 @@
 #include <stdint.h>
-#include "myos.h"
+
+#include "common.h"
+#include "lib.h"
 #include "sysio.h"
 
 #define CONFIG_ADDRESS 0xCF8

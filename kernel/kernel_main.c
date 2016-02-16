@@ -1,8 +1,9 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "common.h"
 #include "descriptor_table.h"
-#include "myos.h"
+#include "lib.h"
 #include "pci.h"
 
 void kernel_main() {
@@ -11,7 +12,7 @@ void kernel_main() {
 
     pci_scan();
     kprintf("hello world\n");
+    asm volatile ("int $40");
 
-    asm ("int $0x40");
     while (1) ;
 }

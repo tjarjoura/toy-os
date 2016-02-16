@@ -27,8 +27,8 @@ _start:
 
   # Just in case kernel_main returns
   cli
-  hlt
 .Lhang:
+  hlt
   jmp .Lhang
 
 # Record the size of the _start function for debugging

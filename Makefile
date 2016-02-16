@@ -32,3 +32,6 @@ iso: myos.bin
 clean:
 	rm $(OBJS) myos.bin myos.iso
 
+run:
+	qemu -cdrom myos.iso
+
