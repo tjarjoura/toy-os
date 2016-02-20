@@ -42,6 +42,9 @@ void kprintf(const char *fmt, ...) {
             case '%':
                 vga_putchar('%');
                 continue;
+            case 'b':
+                write_int(va_arg(ap, int), 2);
+                continue;
             case 'd':
                 write_int(va_arg(ap, int), 10);
                 continue;

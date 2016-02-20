@@ -1,6 +1,7 @@
 .intel_syntax noprefix
 
-.extern interrupt_handler
+.extern common_interrupt_handler
+.extern common_irq_handler
 
 .section .text
     .macro ISR_NOERRCODE intnum
@@ -33,7 +34,7 @@
 
     interrupt_common:
         pusha
-        call interrupt_handler
+        call common_interrupt_handler
         popa
         add esp, 8
         sti
@@ -41,7 +42,7 @@
 
     irq_common:
         pusha
-        call irq_handler
+        call common_irq_handler
         popa
         add esp, 8
         sti

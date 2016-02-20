@@ -35,3 +35,5 @@ clean:
 run:
 	qemu -cdrom myos.iso
 
+usb:
+	sudo dd if=myos.iso of=/dev/sdb

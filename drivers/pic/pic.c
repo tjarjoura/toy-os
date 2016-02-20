@@ -1,34 +1,38 @@
 #include <stdint.h>
-
 #include "sysio.h"
+
+#define MASTER_PIC_COMMAND 0x20
+#define MASTER_PIC_DATA    0x21
+#define SLAVE_PIC_COMMAND  0xA0
+#define SLAVE_PIC_DATA     0xA1
 
 void init_pic() {
     uint8_t a, b;
-    a = inb(0x21);
-    b = inb(0xA1);
+    a = inb(MASTER_PIC_DATA);
+    b = inb(SLAVE_PIC_DATA);
 
     /* Remap IRQ offsets on the PIC (Programmable Interrupt Controller) */
-    outb(0x20, 0x11);
+    outb(MASTER_PIC_COMMAND, 0x10);
     io_wait();
-    outb(0xA0, 0x11);
+    outb(SLAVE_PIC_COMMAND, 0x10);
     io_wait();
-    outb(0x21, 0x20);
+    outb(MASTER_PIC_DATA, 0x20);
     io_wait();
-    outb(0xA1, 0x28);
+    outb(SLAVE_PIC_DATA, 0x28);
     io_wait();
-    outb(0x21, 0x04);
+    outb(MASTER_PIC_DATA, 0x04);
     io_wait();
-    outb(0xA1, 0x02);
+    outb(SLAVE_PIC_DATA, 0x02);
     io_wait();
-    outb(0x21, 0x01);
+    outb(MASTER_PIC_DATA, 0x01);
     io_wait();
-    outb(0xA1, 0x01);
+    outb(SLAVE_PIC_DATA, 0x01);
     io_wait();
-    outb(0x21, 0x0);
+    outb(MASTER_PIC_DATA, 0x0);
     io_wait();
-    outb(0xA1, 0x0);
+    outb(SLAVE_PIC_DATA, 0x0);
     io_wait();
 
-    outb(0x21, a);
-    outb(0xA1, b);
+    outb(MASTER_PIC_DATA, a);
+    outb(SLAVE_PIC_DATA, b);
 }

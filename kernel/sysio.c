@@ -1,8 +1,7 @@
 #include <stdint.h>
 
 void io_wait() {
-    asm volatile ("outb $80");
-    asm volatile ("outb $80");
+    asm volatile ("outb %%al, $80" : : "a"(0));
 }
 
 void outb(uint16_t port, uint8_t data) {

@@ -1,6 +1,6 @@
-/* vgatext.c
+/** vgatext.c
  *
- * This is a driver for the VGA text mode buffer provided by BIOS.
+ *  This is a driver for the VGA text mode buffer provided by BIOS.
  */
 
 #include <stdint.h>

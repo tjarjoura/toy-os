@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include "descriptor_table.h"
+#include "interrupt.h"
 #include "isr.h"
 #include "lib.h"
 #include "common.h"
@@ -7,15 +8,11 @@
 
 void flush_idt(void *);
 
-/* This contains our saved state, pushed to the stack when an interrupt occurs */
-struct saved_registers {
-    uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; /* Pushed by pusha */
-    uint32_t int_num, err_code;
-};
+static interrupt_handler_t handlers[256];
 
-/* A void function pointer type, used as a callback for an interrupt number */
-typedef void (*interrupt_handler_t) (struct saved_registers);
-interrupt_handler_t handlers[256];
+void set_interrupt_handler(uint8_t int_num, interrupt_handler_t handler) {
+    handlers[int_num] = handler;
+}
 
 /* Interrupt Descriptor Table */
 struct idt_entry {
@@ -48,20 +45,23 @@ static struct idt_entry idt_entry(uint32_t offset, uint16_t selector, uint8_t fl
     return entry;
 }
 
-void interrupt_handler(struct saved_registers saved_registers) {
+void common_interrupt_handler(struct saved_registers saved_registers) {
     kprintf("Received interrupt: %d\n", saved_registers.int_num);
     kprintf("Error code : %d\n", saved_registers.err_code);
+
+    if (handlers[saved_registers.int_num] != NULL)
+        handlers[saved_registers.int_num](saved_registers);
 }
 
-void irq_handler(struct saved_registers saved_registers) {
-    if (saved_registers.int_num > 40) /* Interrupt came from Slave PIC */
-        outb(0xA0, 0x20);
-    outb(0x20, 0x20); /* Send EOI signal to PIC controllers */
-
+void common_irq_handler(struct saved_registers saved_registers) {
     kprintf("Received Interrupt(IRQ): %d\n", saved_registers.int_num);
 
     if (handlers[saved_registers.int_num] != NULL)
         handlers[saved_registers.int_num](saved_registers);
+
+    if (saved_registers.int_num > 40) /* Interrupt came from Slave PIC */
+        outb(0xA0, 0x20);
+    outb(0x20, 0x20); /* Send EOI signal to PIC controllers */
 }
 
 /* These functions are small identical stubs that will take direct the code to

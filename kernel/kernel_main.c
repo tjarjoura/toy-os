@@ -5,14 +5,16 @@
 #include "descriptor_table.h"
 #include "lib.h"
 #include "pci.h"
+#include "pic.h"
+#include "ps2.h"
 
 void kernel_main() {
     init_gdt();
     init_idt();
-
+    init_pic();
     pci_scan();
-    kprintf("hello world\n");
-    asm volatile ("int $40");
+    init_ps2();
 
-    while (1) ;
+    while (1)
+        ;
 }
